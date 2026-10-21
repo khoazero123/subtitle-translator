@@ -43,6 +43,7 @@ import TranslateFailurePanel from "@/app/components/TranslateFailurePanel";
 
 import UploadSourceCard from "@/app/components/UploadSourceCard";
 import CastContextPanel from "@/app/components/CastContextPanel";
+import { toSubtitleLanguageCode } from "@/app/utils/subtitleLanguageCode";
 
 import dynamic from "next/dynamic";
 import { useFileExport, describeExport } from "@/app/hooks/useFileExport";
@@ -221,7 +222,7 @@ const SubtitleTranslator = () => {
   // 重试时保持上一次预览的语种)而非主 targetLanguage,不记录的话导出文件名会
   // 标错语种(主 targetLanguage 跟 translatedText 内容不匹配)
   const [translatedTextLang, setTranslatedTextLang] = useState<string | null>(null);
-  const { customFileName, setCustomFileName, generateFileName } = useExportFilename("subtitle-translator");
+  const { customFileName, setCustomFileName, generateFileName } = useExportFilename("subtitle-translator", "{name}.{lang}.{ext}");
 
   // 源文本变化时只复位"源派生"的本地预览(extractedText)。译文结果及其元数据
   // (translatedText / translatedTextExt / needsBilingualSuffix / translatedTextLang)保留——
@@ -342,8 +343,9 @@ const SubtitleTranslator = () => {
         const emptiedSlots = collectEmptiedSlots(rawTranslatedLines, cleanedTranslated, softFilled);
         const translatedLines = isAss ? restoreAssAfterTranslation(cleanedTranslated, tagMaps) : cleanedTranslated;
 
-        // Generate file name base
-        const langLabel = currentTargetLang;
+        // Generate file name base — three-letter code (vie/sgn...) so the export
+        // never collides with the uploaded source in the same folder.
+        const langLabel = toSubtitleLanguageCode(currentTargetLang);
 
         // Handle different export modes
         if (exportMode === "both") {
@@ -429,7 +431,7 @@ const SubtitleTranslator = () => {
     // ResultCard 只在 translatedText 非空时渲染,而 translatedText 写入必伴随 ext/lang
     // 的同帧 setState,所以 handleExportFile 触发时两者必非 null —— ?? 仅作类型收窄兜底
     const fileExt = translatedTextExt ?? "srt";
-    const langLabel = translatedTextLang ?? targetLanguage;
+    const langLabel = toSubtitleLanguageCode(translatedTextLang ?? targetLanguage);
 
     // Use custom filename if set, otherwise use default pattern
     let fileName = generateFileName(uploadFileName, langLabel, fileExt, multiLanguageMode);

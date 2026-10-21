@@ -31,13 +31,15 @@ interface ExportFilenameConfig {
  * - {date} - current date (YYYY-MM-DD)
  * - {time} - current time (HHMMss)
  */
-export const useExportFilename = (toolKey: string = "default"): ExportFilenameConfig => {
+export const useExportFilename = (toolKey: string = "default", defaultPattern: string = "{name}.{ext}"): ExportFilenameConfig => {
   const storageKey = `${toolKey}-exportFileName`;
-  // Default is the CLEAN `{name}.{ext}` — most exports are single-language and
-  // users expect the original name. Multi-language collisions are handled by the
-  // `disambiguateLang` arg (auto-injects _{lang}), NOT by baking {lang} into the
-  // default (which made every single-language export needlessly verbose).
-  const [customFileName, setCustomFileName] = useLocalStorage<string>(storageKey, "{name}.{ext}");
+  // The subtitle tool passes `{name}.{lang}.{ext}` — a translated file that keeps
+  // the source name is indistinguishable from the original in a download folder,
+  // and overwriting it silently costs the user their source. Other tools keep the
+  // clean `{name}.{ext}`.
+  // Multi-language collisions are handled by the `disambiguateLang` arg
+  // (auto-injects _{lang}) when the pattern carries no {lang} of its own.
+  const [customFileName, setCustomFileName] = useLocalStorage<string>(storageKey, defaultPattern);
 
   const generateFileName = (originalFileName: string, langCode: string, defaultExt?: string, disambiguateLang = false): string => {
     // Extract name and extension from original filename
