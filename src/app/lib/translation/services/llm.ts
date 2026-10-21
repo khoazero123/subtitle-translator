@@ -30,11 +30,15 @@ import { fetchJSON, normalizeNumber, normalizePrompt, requireApiKey, requireUrl,
 // the prefix is byte-stable across requests and is what provider prefix
 // caching keys on (subtitle-translator#53). Anything per-request — today the
 // glossary block — goes on the suffix side, never into the prefix or system.
-const preparePrompts = (params: { text: string; targetLanguage: string; sourceLanguage: string; systemPrompt?: string; userPrompt?: string; fullText?: string; glossaryBlock?: string }) => {
+const preparePrompts = (params: { text: string; targetLanguage: string; sourceLanguage: string; systemPrompt?: string; userPrompt?: string; fullText?: string; glossaryBlock?: string; castBlock?: string }) => {
   const effectiveSystemPrompt = normalizePrompt(params.systemPrompt, DEFAULT_SYSTEM_PROMPT);
   const effectiveUserPrompt = normalizePrompt(params.userPrompt, DEFAULT_USER_PROMPT);
   const { prefix: promptPrefix, suffix } = getAIModelPromptParts(params.text, effectiveUserPrompt, params.targetLanguage, params.sourceLanguage, params.fullText);
-  const promptSuffix = params.glossaryBlock ? `${params.glossaryBlock}\n\n${suffix}` : suffix;
+  // Dynamic side of the user message, in reading order: the character sheet
+  // frames who is speaking, the glossary pins terminology inside that frame.
+  // Both stay off the cached prefix (subtitle-translator#53).
+  const dynamicBlock = [params.castBlock, params.glossaryBlock].filter(Boolean).join("\n\n");
+  const promptSuffix = dynamicBlock ? `${dynamicBlock}\n\n${suffix}` : suffix;
   return { effectiveSystemPrompt, prompt: promptPrefix + promptSuffix, promptPrefix, promptSuffix };
 };
 

@@ -179,6 +179,12 @@ export type PipelineRuntimeConfig = TranslationConfig & {
   sourceLanguage: string;
   useCache?: boolean;
   fullText?: string; // Complete text for ${fullText} variable
+  /**
+   * Character sheet for this run (see lib/translation/cast.ts). Injected by the
+   * subtitle tool's cast panel through RuntimeGlobals; forwarded to LLM
+   * services on the prompt's dynamic side, never into the cached prefix.
+   */
+  castBlock?: string;
   /** Per-line retry budget + per-request timeout (seconds) — the hook's user settings. */
   retryCount?: number;
   requestTimeoutSec?: number;
@@ -432,7 +438,7 @@ const translateSingle = async (text: string, cacheSuffix: string, config: Pipeli
   // reasoningEffort is derived per-call from the thinkingEffort record
   // (presence of entry for current model = effort, absence = thinking off).
   // satisfies:每个名字必须真是 TranslateTextParams 的键,改名/删字段时这里编译失败,不再是第三份手抄清单。
-  const optionalFields = ["useCache", "apiKey", "region", "url", "model", "folderId", "temperature", "maxTokens", "systemPrompt", "userPrompt", "sendSystemPrompt", "useRelay", "relayBase", "domains"] as const satisfies readonly (keyof TranslateTextParams)[];
+  const optionalFields = ["useCache", "apiKey", "region", "url", "model", "folderId", "temperature", "maxTokens", "systemPrompt", "userPrompt", "sendSystemPrompt", "useRelay", "relayBase", "domains", "castBlock"] as const satisfies readonly (keyof TranslateTextParams)[];
   const extras: Record<string, unknown> = {};
   const configRecord = config as unknown as Record<string, unknown>;
   for (const key of optionalFields) {
@@ -1197,6 +1203,7 @@ const runTranslateLines = async (
       config,
       systemPrompt,
       userPrompt,
+      castBlock: config.castBlock,
       // Full term set for the target language — the per-request filtered
       // block is a pure function of {text, this set}, so hashing the set
       // keeps the key deterministic while the wire prompt varies per line.

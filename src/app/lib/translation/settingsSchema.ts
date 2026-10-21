@@ -279,4 +279,7 @@ export const pickRuntimeGlobals = (s: Partial<TranslationSettings>): RuntimeGlob
   retryCount: s.retryCount,
   requestTimeoutSec: s.requestTimeoutSec,
   relayBase: s.relayBase,
+  // Not a settings-file knob: the cast sheet is prepared per file in the web
+  // shell's cast panel, and the CLI has no equivalent step.
+  castBlock: undefined,
 });

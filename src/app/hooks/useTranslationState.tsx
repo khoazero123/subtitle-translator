@@ -82,6 +82,10 @@ const useTranslationState = () => {
   const [translationConfigs, setTranslationConfigs] = useLocalStorage<TranslationConfigs>("translation-configs", defaultConfigs as TranslationConfigs);
   const [systemPrompt, setSystemPrompt] = useLocalStorage<string>("translation-systemPrompt", DEFAULT_SYSTEM_PROMPT);
   const [userPrompt, setUserPrompt] = useLocalStorage<string>("translation-userPrompt", DEFAULT_USER_PROMPT);
+  // Character sheet produced by the cast panel (CastContextPanel) for the file
+  // about to be translated. Empty string = feature off, which is also what the
+  // CLI always gets — hence "no block" rather than "empty block" downstream.
+  const [castBlock] = useLocalStorage<string>("translation-castBlock", "");
   const [sourceLanguage, setSourceLanguage] = useLocalStorage<string>("translation-sourceLanguage", "auto");
   const [targetLanguage, setTargetLanguage] = useLocalStorage<string>("translation-targetLanguage", "zh");
   const [targetLanguages, setTargetLanguages] = useLocalStorage<string[]>("translation-targetLanguages", ["zh"]);
@@ -594,7 +598,7 @@ const useTranslationState = () => {
         sourceLanguage,
         useCache,
         config,
-        globals: { systemPrompt: effectiveSystemPrompt, userPrompt: effectiveUserPrompt, retryCount, requestTimeoutSec, relayBase },
+        globals: { systemPrompt: effectiveSystemPrompt, userPrompt: effectiveUserPrompt, retryCount, requestTimeoutSec, relayBase, castBlock: castBlock || undefined },
         independent,
       });
 

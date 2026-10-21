@@ -42,6 +42,7 @@ import AdvancedTranslationSettings from "@/app/components/AdvancedTranslationSet
 import TranslateFailurePanel from "@/app/components/TranslateFailurePanel";
 
 import UploadSourceCard from "@/app/components/UploadSourceCard";
+import CastContextPanel from "@/app/components/CastContextPanel";
 
 import dynamic from "next/dynamic";
 import { useFileExport, describeExport } from "@/app/hooks/useFileExport";
@@ -484,6 +485,10 @@ const SubtitleTranslator = () => {
       <Row gutter={[24, 24]}>
         {/* Left Column: Upload and Main Actions */}
         <Col xs={24} lg={14} xl={15}>
+          {/* Prepared before the run: detects [Speaker] tags, pulls the credited
+              cast from TMDB, and feeds the character sheet into the prompt. Per
+              file, so it sits above the upload card rather than in settings. */}
+          <CastContextPanel sourceText={sourceText} fileName={firstFileName || ""} />
           <UploadSourceCard upload={upload} stats={sourceStats} fileTypes={uploadFileTypes} multiFile textDirection="auto" locked={isTranslating} onClear={clearResults} onSourceChange={clearResults}>
 
             <Divider />

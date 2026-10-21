@@ -59,6 +59,13 @@ export interface TranslateTextParams extends Omit<TranslationConfig, "chunkSize"
   // and a per-request block there defeats prefix caching for every provider
   // (subtitle-translator#53).
   glossaryBlock?: string;
+  /**
+   * Rendered character sheet (speakers + gender/age) for the file being
+   * translated. Same dynamic slot as `glossaryBlock` — it must never enter the
+   * cached prefix, because a different sheet changes what the model is told
+   * about who is speaking, not what it is being asked to translate.
+   */
+  castBlock?: string;
   fullText?: string; // Optional: complete text for ${fullText} variable
   signal?: AbortSignal; // Optional: for request cancellation
 }
@@ -93,6 +100,13 @@ export type RuntimeGlobals = {
   retryCount: number | undefined;
   requestTimeoutSec: number | undefined;
   relayBase: string | undefined;
+  /**
+   * Character sheet prepared by the subtitle tool before a run (see
+   * lib/translation/cast.ts). Required key like every other global so both
+   * shells — web and CLI — fail to compile until they decide what to pass;
+   * the CLI passes undefined (it has no cast panel).
+   */
+  castBlock: string | undefined;
 };
 
 export interface TranslationConfig {

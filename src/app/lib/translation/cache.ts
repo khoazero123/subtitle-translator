@@ -30,6 +30,14 @@ export type CacheSuffixInput = {
    * don't enter the hash; absent/empty hashes identical to pre-glossary keys.
    */
   glossaryTerms?: GlossaryTerm[];
+  /**
+   * Rendered character sheet for this run (see lib/translation/cast.ts). It
+   * rides the prompt's dynamic side, but unlike the glossary it is fixed for
+   * the whole run and changes what the model is told about the speakers — two
+   * runs with different sheets must not share cache entries. Absent keeps
+   * pre-cast entries valid.
+   */
+  castBlock?: string;
 };
 
 // Stable, trimmed wire-relevant projection of the term list for hashing.
@@ -43,7 +51,7 @@ const hashableTerms = (terms?: GlossaryTerm[]): string[][] | undefined => {
  * config affects output (LLM-style and Qwen-MT), hashes the relevant fields
  * into the suffix so config changes invalidate stale entries automatically.
  */
-export const generateCacheSuffix = ({ sourceLanguage, targetLanguage, translationMethod, config, systemPrompt, userPrompt, glossaryTerms }: CacheSuffixInput): string => {
+export const generateCacheSuffix = ({ sourceLanguage, targetLanguage, translationMethod, config, systemPrompt, userPrompt, glossaryTerms, castBlock }: CacheSuffixInput): string => {
   const base = `${targetLanguage}_${sourceLanguage}_${translationMethod}`;
   const terms = hashableTerms(glossaryTerms);
 
@@ -79,6 +87,9 @@ export const generateCacheSuffix = ({ sourceLanguage, targetLanguage, translatio
       // Glossary terms steer the per-request prompt block. Key absent when no
       // complete terms — pre-glossary cache entries stay valid.
       ...(terms && { glossaryTerms: terms }),
+      // Character sheet: only LLM providers receive it (the block is a prompt),
+      // so only they hash it.
+      ...(castBlock && { castBlock }),
     };
     return `${base}_${SparkMD5.hash(JSON.stringify(payload))}`;
   }
