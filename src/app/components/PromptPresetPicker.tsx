@@ -17,7 +17,9 @@ const PromptPresetPicker = () => {
   const { message } = App.useApp();
   const {
     promptPresets,
+    builtinPromptPresets,
     activePromptPresetId,
+    isReadOnlyPromptPreset,
     savePromptPreset,
     loadPromptPreset,
     updatePromptPreset,
@@ -40,9 +42,16 @@ const PromptPresetPicker = () => {
   // The default-prompt entry is always present and read-only: selecting it loads
   // the factory prompts, but it can't be overwritten or deleted. "Save to current"
   // and "delete" act on a selected user preset only — disabled otherwise.
-  const isDefaultActive = activePromptPresetId === DEFAULT_PROMPT_PRESET_ID;
-  const canEditActive = !!activePromptPresetId && !isDefaultActive;
-  const options = [{ label: t("presetDefault"), value: DEFAULT_PROMPT_PRESET_ID }, ...promptPresets.map((p) => ({ label: p.name, value: p.id }))];
+  // Built-ins ship with the bundle and, like "default", are selectable but not
+  // editable or deletable — a shared preset that anyone can silently rewrite is
+  // not shared policy.
+  const isReadOnlyActive = !!activePromptPresetId && isReadOnlyPromptPreset(activePromptPresetId);
+  const canEditActive = !!activePromptPresetId && !isReadOnlyActive;
+  const options = [
+    { label: t("presetDefault"), value: DEFAULT_PROMPT_PRESET_ID },
+    ...builtinPromptPresets.map((p) => ({ label: `★ ${p.name}`, value: p.id })),
+    ...promptPresets.map((p) => ({ label: p.name, value: p.id })),
+  ];
 
   return (
     <div style={{ marginBottom: 16 }}>
@@ -57,7 +66,7 @@ const PromptPresetPicker = () => {
           onClear={() => loadPromptPreset("")}
           options={options}
         />
-        <Tooltip title={isDefaultActive ? t("presetDefaultReadonly") : t("presetUpdate")}>
+        <Tooltip title={isReadOnlyActive ? t("presetDefaultReadonly") : t("presetUpdate")}>
           <Button
             icon={<SaveOutlined />}
             disabled={!canEditActive}
@@ -88,7 +97,7 @@ const PromptPresetPicker = () => {
             }
           }}
           disabled={!canEditActive}>
-          <Tooltip title={isDefaultActive ? t("presetDefaultReadonly") : t("presetDelete")}>
+          <Tooltip title={isReadOnlyActive ? t("presetDefaultReadonly") : t("presetDelete")}>
             <Button
               danger
               icon={<DeleteOutlined />}

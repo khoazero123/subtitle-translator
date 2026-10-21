@@ -236,6 +236,8 @@ const useTranslationState = () => {
   const {
     promptPresets,
     setPromptPresets,
+    builtinPromptPresets,
+    isReadOnlyPromptPreset,
     activePromptPresetId,
     setActivePromptPresetId,
     savePromptPreset,
@@ -248,6 +250,9 @@ const useTranslationState = () => {
     effectiveUserPrompt,
     setSystemPrompt,
     setUserPrompt,
+    // Lets a built-in preset bring the settings it depends on (the Vietnamese
+    // preset needs ♪ in removeChars for its SDH deletion to reach the file).
+    setRemoveChars,
   });
 
   // Settings export/import
@@ -1004,6 +1009,8 @@ const useTranslationState = () => {
     renameLlmPreset,
     updateLlmPreset,
     promptPresets,
+    builtinPromptPresets,
+    isReadOnlyPromptPreset,
     activePromptPresetId,
     savePromptPreset,
     loadPromptPreset,
