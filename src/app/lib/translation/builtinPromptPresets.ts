@@ -51,7 +51,15 @@ SDH / NON-DIALOGUE AUDIO
 13. If a whole line is only audio description or music — [sighs], (engine rumbling), [door slams], [gunfire], ♪ music ♪, (laughs), [indistinct chatter] — output exactly one character: ♪
     Never translate it, never describe it, never return an empty line.
 14. If audio description appears inside a line that also has dialogue, delete the description and its brackets/tags entirely (including an <i></i> wrapper around it), keep the dialogue, the leading dash and the original punctuation. Leave no empty brackets, double spaces or dangling dashes.
-15. Descriptions of the delivery channel — (over radio), (on phone), (whispering), (V.O.) — follow the same rule as 14: remove by default.`,
+15. Descriptions of the delivery channel — (over radio), (on phone), (whispering), (V.O.) — follow the same rule as 14: remove by default.
+
+ADDRESS TERMS (xưng hô)
+16. Decide ONE pronoun pair per pair of speakers before you translate, and keep it for the whole file. Derive it from age, gender, status and relationship — never from the mood of a single line.
+17. When age, gender or relationship is not clear from the source, use the neutral pair "tôi – bạn". Do not guess anh/em, chú/cháu, ông/cháu or mày/tao from tone alone.
+18. Reserve "mày – tao" for lines that are clearly hostile or vulgar in the source. Banter, sarcasm and shouting do not by themselves justify it.
+19. Narration and voice-over speak as "tôi".
+20. When one character addresses another by name, keep the name instead of inventing a kinship term (chú, bác, anh, em) that the story never established.
+21. When a cast sheet supplies gender and age, use it to choose the pair; when it does not, rule 17 applies.`,
     userPrompt: `Dịch đoạn phụ đề dưới đây sang tiếng Việt.
 
 Yêu cầu bắt buộc:
@@ -72,6 +80,14 @@ Xử lý âm thanh (SDH) — quan trọng:
 - Nếu dòng có cả thoại và mô tả âm thanh: xoá hẳn phần mô tả kèm ngoặc/tag (kể cả <i></i> bọc nó), giữ phần thoại, giữ gạch đầu dòng và dấu câu; không để lại ngoặc rỗng, khoảng trắng đôi hay gạch đầu dòng treo.
 - Tag TÊN NHÂN VẬT như [Joe], [Vasili], [Guard 1] KHÔNG phải mô tả âm thanh — phải giữ nguyên, đó là người đang nói.
 - Mô tả kênh thoại — (qua radio), (qua điện thoại), (thì thầm), (V.O.) — cũng xoá như mô tả âm thanh.
+
+Xưng hô (quan trọng — quyết trước khi dịch):
+- Tự lập bảng: mỗi cặp nhân vật dùng đúng MỘT cặp đại từ, giữ nguyên suốt file. Quyết định theo tuổi, giới tính, vai vế, quan hệ — không theo sắc thái của một câu.
+- Không xác định được tuổi/giới tính/quan hệ → dùng "tôi – bạn" (trung tính). Không đoán anh/em, chú/cháu, ông/cháu.
+- Chỉ dùng "mày – tao" khi nguyên văn rõ ràng là chửi mắng, xúc phạm; trêu đùa, mỉa mai, quát tháo không đủ để đổi.
+- Lời dẫn, độc thoại (V.O.) dùng "tôi".
+- Khi nhân vật gọi tên người kia thì giữ tên, không tự thêm vai vế (chú, bác, anh, em) mà truyện không có.
+- Có bảng nhân vật (giới tính/tuổi) thì dùng để chọn cặp đại từ; không có thì áp dụng "tôi – bạn".
 
 Nội dung cần dịch:
 \${content}`,
